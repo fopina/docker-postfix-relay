@@ -6,6 +6,10 @@ if [ -n "$1" ]; then
 	exec "$@"
 fi
 
+if [ -n "$SMTP_PASSWORD_FILE" ]; then
+	SMTP_PASSWORD="$(cat $SMTP_PASSWORD_FILE)"
+fi
+
 [ -z "$SMTP_LOGIN" -o -z "$SMTP_PASSWORD" ] && {
 	echo "SMTP_LOGIN and SMTP_PASSWORD _must_ be defined" >&2
 	exit 1

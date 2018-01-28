@@ -15,7 +15,7 @@ Postfix on port `25`
 * `SMTP_HOST` (default: `smtp.gmail.com`)
 * `SMTP_PORT` (default: `587`)
 * `SMTP_LOGIN` **required**
-* `SMTP_PASSWORD` **required**
+* `SMTP_PASSWORD` **required** or use `SMTP_PASSWORD_FILE` point to a file with the password (useful with docker secrets and others)
 * `TLS_VERIFY` (default: `may`) options: none, may, encrypt, dane, dane-only, fingerprint, verify, secure
 
 Container `HOSTNAME` variable is used as relay hostname (`myhostname = ${HOSTNAME}` in postfix configuration).
@@ -25,3 +25,7 @@ Container `HOSTNAME` variable is used as relay hostname (`myhostname = ${HOSTNAM
 Launch Postfix container:
 
     docker run -d -e SMTP_LOGIN=a@gmail.com -e SMTP_PASSWORD=xx -p 25:25 fopina/postfix-relay
+
+Or using the password file variable:
+
+	docker run -d -v /docker/secrets:/secrets:ro -e SMTP_LOGIN=a@gmail.com -e SMTP_PASSWORD_FILE=/secrets/smtp_pwd.txt -p 25:25 fopina/postfix-relay
