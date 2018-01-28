@@ -29,3 +29,12 @@ Launch Postfix container:
 Or using the password file variable:
 
 	docker run -d -v /docker/secrets:/secrets:ro -e SMTP_LOGIN=a@gmail.com -e SMTP_PASSWORD_FILE=/secrets/smtp_pwd.txt -p 25:25 fopina/postfix-relay
+
+
+Using it with other containers, no need to publish port:
+
+	docker run -d --name=mailrelay -e SMTP_LOGIN=a@gmail.com -e SMTP_PASSWORD=xx fopina/postfix-relay
+
+And then just link the other container (this is testing one that you can use to verify all is good):
+
+	docker run --rm --link mailrelay:mailrelay fopina/postfix-relay:tester from@mail.com test@mail.com
