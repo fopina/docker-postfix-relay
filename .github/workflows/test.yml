@@ -1,0 +1,21 @@
+name: publish to dockerhub
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Check out code"
+        uses: actions/checkout@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          load: true
+          tags: |
+            test-build
