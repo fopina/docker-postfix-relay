@@ -13,6 +13,12 @@ jobs:
       - name: "Check out code"
         uses: actions/checkout@v3
 
+      - name: Prepare
+        id: prepare
+        run: |
+            TAG=${GITHUB_REF#refs/tags/}
+            echo ::set-output name=tag_name::${TAG}
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -37,10 +43,8 @@ jobs:
         with:
           push: true
           tags: |
-            fopina/apcupsd:3.14.14.4
-            ghcr.io/fopina/apcupsd:3.14.14.4
-            fopina/apcupsd:latest
-            ghcr.io/fopina/apcupsd:latest
+            fopina/postfix-relay:${{ steps.prepare.outputs.tag_name }}
+            ghcr.io/fopina/postfix-relay:${{ steps.prepare.outputs.tag_name }}
+            fopina/postfix-relay:latest
+            ghcr.io/fopina/postfix-relay:latest
           platforms: linux/amd64,linux/arm64,linux/arm/v7
-          build-args: |
-            VERSION=3.14.14.4
