@@ -10,21 +10,21 @@ jobs:
   autoupdate:
     runs-on: ubuntu-latest
     steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
       - name: Get used version
         id: used_version
-        run: |
-            TAG=$(docker run --rm \
-                             --entrypoint "" \
-                             ghcr.io/fopina/postfix-relay:latest \
-                             apk version postfix | grep ^postfix | cut -d ' ' -f1 | cut -d '-' -f2-)
-            echo ::set-output name=version::${TAG}
+        uses: ./.github/actions/docker-apk-version
+
       - name: Get latest version
         id: latest_version
+        shell: bash
         run: |
-            TAG=$(docker run --rm \
-                             alpine \
-                             sh -c "apk update && apk info postfix" | grep ' description:$' | cut -d ' ' -f1 | cut -d '-' -f2-)
-            echo ::set-output name=version::${TAG}
+            echo "version=$(docker run --rm \
+                                       alpine \
+                                       sh -c "apk update && apk info postfix" | grep ' description:$' | cut -d ' ' -f1 | cut -d '-' -f2-)" \
+                 >> $GITHUB_OUTPUT
 
       - name: Check for any new
         if: steps.used_version.outputs.version != steps.latest_version.outputs.version
