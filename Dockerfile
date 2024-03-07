@@ -1,4 +1,4 @@
-FROM alpine:3.19
+FROM alpine:3.6
 
 RUN apk --no-cache add ca-certificates postfix gettext rsyslog s6
 
