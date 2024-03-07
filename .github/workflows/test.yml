@@ -21,8 +21,8 @@ jobs:
             test-build
       
       - name: Check version
-        run: >
-          docker run --rm 
-                     --entrypoint "" 
-                     test-build 
+        run: |
+          docker run --rm \
+                     --entrypoint "" \
+                     test-build \
                      apk version postfix | grep ^postfix | cut -d ' ' -f1 | cut -d '-' -f2-
