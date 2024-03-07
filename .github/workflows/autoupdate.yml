@@ -1,0 +1,33 @@
+name: auto update
+
+on:
+  schedule:
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+    inputs:
+
+jobs:
+  autoupdate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get used version
+        id: used_version
+        run: |
+            TAG=$(docker run --rm \
+                             --entrypoint "" \
+                             ghcr.io/fopina/postfix-relay:latest \
+                             apk version postfix | grep ^postfix | cut -d ' ' -f1 | cut -d '-' -f2-)
+            echo ::set-output name=version::${TAG}
+      - name: Get latest version
+        id: latest_version
+        run: |
+            TAG=$(docker run --rm \
+                             alpine \
+                             sh -c "apk update && apk info postfix" | grep ' description:$' | cut -d ' ' -f1 | cut -d '-' -f2-)
+            echo ::set-output name=version::${TAG}
+
+      - name: Check for any new
+        if: steps.used_version.outputs.version != steps.latest_version.outputs.version
+        run: |
+            echo postfix version updated from ${{ steps.used_version.outputs.version }} to ${{ steps.latest_version.outputs.version }}
+            exit 1
