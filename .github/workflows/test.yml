@@ -40,6 +40,7 @@ jobs:
             echo ::set-output name=version::${TAG}
 
       - uses: actions/github-script@v3
+        if: steps.this_version.outputs.version != steps.latest_version.outputs.version
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |

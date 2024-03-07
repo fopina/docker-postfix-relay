@@ -13,12 +13,6 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Prepare
-        id: prepare
-        run: |
-            TAG=${GITHUB_REF#refs/tags/}
-            echo ::set-output name=tag_name::${TAG}
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -38,13 +32,32 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Build
+        uses: docker/build-push-action@v5
+        with:
+          load: true
+          tags: |
+            test-build
+
+      - name: Check version
+        id: this_version
+        run: |
+          TAG=$(docker run --rm \
+                           --entrypoint "" \
+                           test-build \
+                           apk version postfix | grep ^postfix | cut -d ' ' -f1 | cut -d '-' -f2-)
+          echo ::set-output name=version::${TAG}
+          echo Postfix version ${TAG}
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           push: true
           tags: |
-            fopina/postfix-relay:${{ steps.prepare.outputs.tag_name }}
-            ghcr.io/fopina/postfix-relay:${{ steps.prepare.outputs.tag_name }}
+            fopina/postfix-relay:${{ steps.this_version.outputs.version }}
+            ghcr.io/fopina/postfix-relay:${{ steps.this_version.outputs.version }}
+            fopina/postfix-relay:${{ steps.this_version.outputs.version }}-${{ github.run_number }}
+            ghcr.io/fopina/postfix-relay:${{ steps.this_version.outputs.version }}-${{ github.run_number }}
             fopina/postfix-relay:latest
             ghcr.io/fopina/postfix-relay:latest
           platforms: linux/amd64,linux/arm64,linux/arm/v7
