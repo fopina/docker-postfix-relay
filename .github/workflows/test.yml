@@ -22,6 +22,7 @@ jobs:
       
       - name: Check version
         id: this_version
+        shell: bash
         run: |
           TAG=$(docker run --rm \
                            --entrypoint "" \
@@ -32,6 +33,7 @@ jobs:
 
       - name: Get latest version
         id: latest_version
+        shell: bash
         run: |
             TAG=$(docker run --rm \
                              --entrypoint "" \

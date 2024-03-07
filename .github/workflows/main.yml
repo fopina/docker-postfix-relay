@@ -41,6 +41,7 @@ jobs:
 
       - name: Check version
         id: this_version
+        shell: bash
         run: |
           TAG=$(docker run --rm \
                            --entrypoint "" \

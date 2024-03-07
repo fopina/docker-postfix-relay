@@ -12,14 +12,17 @@ jobs:
     steps:
       - name: Get used version
         id: used_version
+        shell: bash
         run: |
             TAG=$(docker run --rm \
                              --entrypoint "" \
                              ghcr.io/fopina/postfix-relay:latest \
                              apk version postfix | grep ^postfix | cut -d ' ' -f1 | cut -d '-' -f2-)
             echo ::set-output name=version::${TAG}
+
       - name: Get latest version
         id: latest_version
+        shell: bash
         run: |
             TAG=$(docker run --rm \
                              alpine \
