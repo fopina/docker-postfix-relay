@@ -41,14 +41,9 @@ jobs:
 
       - name: Check version
         id: this_version
-        shell: bash
-        run: |
-          TAG=$(docker run --rm \
-                           --entrypoint "" \
-                           test-build \
-                           apk version postfix | grep ^postfix | cut -d ' ' -f1 | cut -d '-' -f2-)
-          echo ::set-output name=version::${TAG}
-          echo Postfix version ${TAG}
+        uses: ./.github/actions/docker-apk-version
+        with:
+          image: test-build
 
       - name: Build and push
         uses: docker/build-push-action@v5

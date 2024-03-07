@@ -1,0 +1,28 @@
+name: 'Docker APK Version'
+description: 'Check package version in an alpine docker image'
+inputs:
+  image:
+    description: 'docker image (and tag) to use'
+    required: true
+    default: ghcr.io/fopina/postfix-relay:latest
+  package:
+    description: 'apk package to query'
+    required: true
+    default: postfix
+outputs:
+  version:
+    description: "Version"
+    value: ${{ steps.version-output.outputs.version }}
+runs:
+  using: "composite"
+  steps:
+    - name: Get used version
+      id: version-output
+      shell: bash
+      run: |
+          TAG=$(docker run --rm \
+                            --entrypoint "" \
+                            ${{ inputs.image }} \
+                            apk version ${{ inputs.package }} | grep ^${{ inputs.package }} | cut -d ' ' -f1 | cut -d '-' -f2-)
+          echo ::set-output name=version::${TAG}
+          echo ${{ inputs.image }} installed version of ${{ inputs.package }} is ${TAG}

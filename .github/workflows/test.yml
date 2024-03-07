@@ -19,27 +19,16 @@ jobs:
           load: true
           tags: |
             test-build
-      
+
       - name: Check version
         id: this_version
-        shell: bash
-        run: |
-          TAG=$(docker run --rm \
-                           --entrypoint "" \
-                           test-build \
-                           apk version postfix | grep ^postfix | cut -d ' ' -f1 | cut -d '-' -f2-)
-          echo ::set-output name=version::${TAG}
-          echo Postfix version ${TAG}
+        uses: ./.github/actions/docker-apk-version
+        with:
+          image: test-build
 
       - name: Get latest version
         id: latest_version
-        shell: bash
-        run: |
-            TAG=$(docker run --rm \
-                             --entrypoint "" \
-                             ghcr.io/fopina/postfix-relay:latest \
-                             apk version postfix | grep ^postfix | cut -d ' ' -f1 | cut -d '-' -f2-)
-            echo ::set-output name=version::${TAG}
+        uses: ./.github/actions/docker-apk-version
 
       - uses: actions/github-script@v3
         if: steps.this_version.outputs.version != steps.latest_version.outputs.version
