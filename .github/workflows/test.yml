@@ -1,0 +1,52 @@
+name: publish to dockerhub
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Build
+        uses: docker/build-push-action@v5
+        with:
+          load: true
+          tags: |
+            test-build
+      
+      - name: Check version
+        id: this_version
+        run: |
+          TAG=$(docker run --rm \
+                           --entrypoint "" \
+                           test-build \
+                           apk version postfix | grep ^postfix | cut -d ' ' -f1 | cut -d '-' -f2-)
+          echo ::set-output name=version::${TAG}
+          echo Postfix version ${TAG}
+
+      - name: Get latest version
+        id: latest_version
+        run: |
+            TAG=$(docker run --rm \
+                             --entrypoint "" \
+                             fopina/postfix-relay:latest \
+                             apk version postfix | grep ^postfix | cut -d ' ' -f1 | cut -d '-' -f2-)
+            echo ::set-output name=version::${TAG}
+
+      - uses: actions/github-script@v3
+        if: steps.this_version.outputs.version != steps.latest_version.outputs.version
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '👋 postfix version updated from ${{ steps.latest_version.outputs.version }} to ${{ steps.this_version.outputs.version }}'
+            })
