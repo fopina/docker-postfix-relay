@@ -29,5 +29,6 @@ jobs:
       - name: Check for any new
         if: steps.used_version.outputs.version != steps.latest_version.outputs.version
         run: |
-            echo postfix version updated from ${{ steps.used_version.outputs.version }} to ${{ steps.latest_version.outputs.version }}
+            echo "### New Version" >> $GITHUB_STEP_SUMMARY
+            echo postfix version updated from ${{ steps.used_version.outputs.version }} to ${{ steps.latest_version.outputs.version }} >> $GITHUB_STEP_SUMMARY
             exit 1
