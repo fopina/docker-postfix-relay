@@ -21,12 +21,23 @@ jobs:
             test-build
       
       - name: Check version
+        id: this_version
         run: |
-          echo "### Hello world! :rocket:" >> $GITHUB_STEP_SUMMARY
-          docker run --rm \
-                     --entrypoint "" \
-                     test-build \
-                     apk version postfix | grep ^postfix | cut -d ' ' -f1 | cut -d '-' -f2-
+          TAG=$(docker run --rm \
+                           --entrypoint "" \
+                           test-build \
+                           apk version postfix | grep ^postfix | cut -d ' ' -f1 | cut -d '-' -f2-)
+          echo ::set-output name=version::${TAG}
+          echo Postfix version ${TAG}
+
+      - name: Get latest version
+        id: latest_version
+        run: |
+            TAG=$(docker run --rm \
+                             --entrypoint "" \
+                             fopina/postfix-relay:latest \
+                             apk version postfix | grep ^postfix | cut -d ' ' -f1 | cut -d '-' -f2-)
+            echo ::set-output name=version::${TAG}
 
       - uses: actions/github-script@v3
         with:
@@ -36,5 +47,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '👋 Thanks for reporting!'
+              body: '👋 postfix version updated from ${{ steps.latest_version.outputs.version }} to ${{ steps.this_version.outputs.version }}'
             })
