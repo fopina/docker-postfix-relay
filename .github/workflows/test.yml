@@ -35,7 +35,7 @@ jobs:
         run: |
             TAG=$(docker run --rm \
                              --entrypoint "" \
-                             fopina/postfix-relay:latest \
+                             ghcr.io/fopina/postfix-relay:latest \
                              apk version postfix | grep ^postfix | cut -d ' ' -f1 | cut -d '-' -f2-)
             echo ::set-output name=version::${TAG}
 
