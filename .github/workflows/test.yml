@@ -22,6 +22,7 @@ jobs:
       
       - name: Check version
         run: |
+          echo "### Hello world! :rocket:" >> $GITHUB_STEP_SUMMARY
           docker run --rm \
                      --entrypoint "" \
                      test-build \
