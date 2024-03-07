@@ -63,5 +63,5 @@ jobs:
       - name: Check for any new
         run: |
             echo "### Published" >> $GITHUB_STEP_SUMMARY
-            echo fopina/postfix-relay:${{ steps.this_version.outputs.version }}-${{ github.run_number }} >> $GITHUB_STEP_SUMMARY
-            echo ghcr.io/fopina/postfix-relay:${{ steps.this_version.outputs.version }}-${{ github.run_number }} >> $GITHUB_STEP_SUMMARY
+            echo "`fopina/postfix-relay:${{ steps.this_version.outputs.version }}-${{ github.run_number }}`" >> $GITHUB_STEP_SUMMARY
+            echo "`ghcr.io/fopina/postfix-relay:${{ steps.this_version.outputs.version }}-${{ github.run_number }}`" >> $GITHUB_STEP_SUMMARY
