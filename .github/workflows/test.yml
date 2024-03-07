@@ -21,7 +21,7 @@ jobs:
             test-build
       
       - name: Check version
-        run: |
+        run: >
           docker run --rm 
                      --entrypoint "" 
                      test-build 
