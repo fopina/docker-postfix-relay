@@ -17,8 +17,8 @@ jobs:
         id: used_version
         uses: ./.github/actions/docker-apk-version
       
-      - name: Get used version
-        id: latest_Version
+      - name: Get latest version
+        id: latest_version
         uses: ./.github/actions/docker-apk-version
         with:
           image: alpine:latest

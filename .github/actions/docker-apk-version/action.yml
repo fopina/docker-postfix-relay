@@ -25,7 +25,7 @@ runs:
       if: inputs.install != 'true'
       run: |
         echo "cmd=apk version ${{ inputs.package }}" >> $GITHUB_OUTPUT
-    - name: Prepare command
+    - name: Prepare command (with install)
       id: latest-command-output
       shell: bash
       if: inputs.install == 'true'
