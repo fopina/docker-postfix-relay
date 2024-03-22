@@ -9,6 +9,9 @@ inputs:
     description: 'apk package to query'
     required: true
     default: postfix
+  install:
+    description: 'apk add package first to check latest version'
+    required: false
 outputs:
   version:
     description: "Version"
@@ -18,11 +21,23 @@ runs:
   steps:
     - name: Get used version
       id: version-output
+      if: inputs.install != 'true'
       shell: bash
       run: |
           TAG=$(docker run --rm \
                             --entrypoint "" \
                             ${{ inputs.image }} \
-                            apk version ${{ inputs.package }} | grep ^${{ inputs.package }} | cut -d ' ' -f1 | cut -d '-' -f2-)
+                            apk version ${{ inputs.package }} | grep ^${{ inputs.package }} | cut -d '=' -f2 | tr -d ' ')
           echo version=${TAG} >> $GITHUB_OUTPUT
           echo ${{ inputs.image }} installed version of ${{ inputs.package }} is ${TAG}
+    - name: Get latest version
+      id: version-output
+      if: inputs.install == 'true'
+      shell: bash
+      run: |
+          TAG=$(docker run --rm \
+                            --entrypoint "" \
+                            ${{ inputs.image }} \
+                            sh -c "apk add ${{ inputs.package }} && apk version ${{ inputs.package }}" | grep ^${{ inputs.package }} | tail -n1 | cut -d '=' -f2 | tr -d ' ')
+          echo version=${TAG} >> $GITHUB_OUTPUT
+          echo ${{ inputs.image }} latest version of ${{ inputs.package }} is ${TAG}

@@ -16,15 +16,13 @@ jobs:
       - name: Get used version
         id: used_version
         uses: ./.github/actions/docker-apk-version
-
-      - name: Get latest version
-        id: latest_version
-        shell: bash
-        run: |
-            echo "version=$(docker run --rm \
-                                       alpine \
-                                       sh -c "apk update && apk info postfix" | grep ' description:$' | cut -d ' ' -f1 | cut -d '-' -f2-)" \
-                 >> $GITHUB_OUTPUT
+      
+      - name: Get used version
+        id: latest_Version
+        uses: ./.github/actions/docker-apk-version
+        with:
+          image: alpine:latest
+          install: true
 
       - name: Check for any new
         if: steps.used_version.outputs.version != steps.latest_version.outputs.version
