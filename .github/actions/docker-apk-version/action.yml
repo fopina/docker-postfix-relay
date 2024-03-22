@@ -19,25 +19,26 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Prepare command
+      id: command-output
+      shell: bash
+      if: inputs.install != 'true'
+      run: |
+        echo "cmd=apk version ${{ inputs.package }}" >> $GITHUB_OUTPUT
+    - name: Prepare command
+      id: latest-command-output
+      shell: bash
+      if: inputs.install == 'true'
+      run: |
+        echo "cmd=apk add ${{ inputs.package }} && apk version ${{ inputs.package }}" >> $GITHUB_OUTPUT
+
     - name: Get used version
       id: version-output
-      if: inputs.install != 'true'
       shell: bash
       run: |
           TAG=$(docker run --rm \
                             --entrypoint "" \
                             ${{ inputs.image }} \
-                            apk version ${{ inputs.package }} | grep ^${{ inputs.package }} | cut -d '=' -f2 | tr -d ' ')
+                            sh -c "${{ steps.command-output.outputs.cmd }}${{ steps.latest-command-output.outputs.cmd }}" | grep ^${{ inputs.package }} | tail -n1 | cut -d '=' -f2 | tr -d ' ')
           echo version=${TAG} >> $GITHUB_OUTPUT
           echo ${{ inputs.image }} installed version of ${{ inputs.package }} is ${TAG}
-    - name: Get latest version
-      id: version-output
-      if: inputs.install == 'true'
-      shell: bash
-      run: |
-          TAG=$(docker run --rm \
-                            --entrypoint "" \
-                            ${{ inputs.image }} \
-                            sh -c "apk add ${{ inputs.package }} && apk version ${{ inputs.package }}" | grep ^${{ inputs.package }} | tail -n1 | cut -d '=' -f2 | tr -d ' ')
-          echo version=${TAG} >> $GITHUB_OUTPUT
-          echo ${{ inputs.image }} latest version of ${{ inputs.package }} is ${TAG}
